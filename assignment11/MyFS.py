@@ -21,7 +21,7 @@ containers={ \
 b"1:      Krerk Piromsopa, Ph. D.\n" \
 b"2:      Veera Muangsin, Ph.D.\n" \
 b"3:      Thongchai Rojkangsadan\n",
-"/students": b"0:CP ENG CU OS 2018S1 - Students, Group Name: Tensou Souji\n"
+"/students": b"0:CP ENG CU OS 2018S1 - Students, Group Name: เทนโด โซจิ\n"
 b"1: 6432164921 Waranthorn Chansawang\n"
 b"2: 6430376521 Siwapat Kanchana\n"
 b"3: 6532143021 Monthawat Sawarak\n",
