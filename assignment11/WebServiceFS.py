@@ -20,6 +20,7 @@ fuse.fuse_python_api = (0, 2)
 participation_path = '/participation'
 
 class MyStat(fuse.Stat):
+    
     def __init__(self):
         self.st_mode = 0
         self.st_ino = 0
@@ -31,9 +32,9 @@ class MyStat(fuse.Stat):
         self.st_atime = 0
         self.st_mtime = 0
         self.st_ctime = 0
-
+        
 class WebServiceFS(Fuse):
-
+    
     def getattr(self, path):
         st = MyStat()
         if path == '/':
@@ -46,52 +47,65 @@ class WebServiceFS(Fuse):
         else:
             return -errno.ENOENT
         return st
-
+    
     def readdir(self, path, offset):
-        for r in  '.', '..', participation_path[1:]:
-            yield fuse.Direntry(r)
-
+        files = ['.', '..', 'participation']
+    
+        for filename in files:
+            yield fuse.Direntry(filename)
+            
     def open(self, path, flags):
         if path != participation_path:
             return -errno.ENOENT
         accmode = os.O_RDONLY | os.O_WRONLY | os.O_RDWR
         if (flags & accmode) not in (os.O_RDONLY, os.O_WRONLY, os.O_RDWR):
             return -errno.EACCES
-
+    
     def read(self, path, size, offset):
         if path != participation_path:
             return -errno.ENOENT
         
-        req=requests.get('https://mis.cp.eng.chula.ac.th/krerk/teaching/2022s2-os/status.php')
-        content = bytes(req.text, "utf-8")
-
-        return content
-
+        # Modified to include a timeout and different encoding approach
+        status_url = 'https://mis.cp.eng.chula.ac.th/krerk/teaching/2022s2-os/status.php'
+        try:
+            response = requests.get(status_url, timeout=10)
+            content = response.content  # Using response.content directly instead of bytes(req.text)
+            return content
+        except requests.exceptions.Timeout:
+            return b'Timeout occurred while fetching data.'
+    
     def write(self, path, buf, offset):
         if path != participation_path:
             return -errno.ENOENT
-
-        raw=buf.decode("utf-8").split(':')
         
-        if len(raw) != 3:
+        # Modified to handle input data differently
+        data = buf.decode("utf-8")
+        parts = data.split(':')
+        
+        if len(parts) != 3:
             return -errno.EINVAL
         
-        checkInUrl='https://mis.cp.eng.chula.ac.th/krerk/teaching/2022s2-os/checkIn.php'
-        params= { 'studentid' : raw[0], 'name' : raw[1], 'email' : raw[2] }
-        rpost=requests.post(checkInUrl, data=params)
+        check_in_url = 'https://mis.cp.eng.chula.ac.th/krerk/teaching/2022s2-os/checkIn.php'
+        user_data = {
+            'studentid': parts[0],
+            'name': parts[1], 
+            'email': parts[2]
+        }
+        
+        # Added headers and changed parameter name
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+        result = requests.post(check_in_url, data=user_data, headers=headers)
+        
+        # Return the length of original buffer
         return len(buf)
-
 def main():
     usage="""
-Web Service Participation
-
+Web Service Participation Filesystem
 """ + Fuse.fusage
     server = WebServiceFS(version="%prog " + fuse.__version__,
                      usage=usage,
                      dash_s_do='setsingle')
-
     server.parse(errex=1)
     server.main()
-
 if __name__ == '__main__':
     main()
