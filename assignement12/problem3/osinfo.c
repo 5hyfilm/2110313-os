@@ -14,7 +14,7 @@ static int dev_minor;
 static int dev_open = 0;
 static char *f_ptr;
 static const char f_data0[] = "0:CP ENG CU OS 2022S2 - Instructors\n1:\tVeera Muangsin,Ph.D.\n2:\tKrerk Piromsopa, Ph.D.\n3:\tThongchai Rojkangsadan\n";
-static const char f_data1[] = "0:CP ENG CU OS 2022S2 - Students, Group Name: Solo Andewing\n1:\t6432154921 Waranthorn Chansawang \n2:\t6430376521 Siwapat Kanchana\n3:\t6532143021 Monthawat Sawarak\n";
+static const char f_data1[] = "0:CP ENG CU OS 2022S2 - Students, Group Name: เทนโด โซจิ\n1:\t6432154921 Waranthorn Chansawang \n2:\t6430376521 Siwapat Kanchana\n3:\t6532143021 Monthawat Sawarak\n";
 // prototypes for device functions
 static int device_open(struct inode *, struct file *);
 static int device_release(struct inode *inode, struct file *file);
